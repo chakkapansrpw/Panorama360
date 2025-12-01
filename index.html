@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360 Panorama Viewer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    
+    <style>
+        #panorama {
+            width: 100vw;
+            height: 100vh;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="panorama"></div>
+
+<script>
+    // ฟังก์ชันสำหรับดึงค่า Parameter จาก URL
+    function getQueryParam(param) {
+        let urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // 1. รับค่า Image ID จาก URL (เช่น ?img=ID_ของรูป)
+    const imageId = getQueryParam('id');
+
+    if (imageId) {
+        // 2. แปลงเป็น Direct Link ของ Google Drive
+        // หมายเหตุ: ต้องตั้งค่ารูปใน Drive เป็น "Anyone with the link"
+        const imageUrl = `https://drive.google.com/uc?export=view&id=${imageId}`;
+
+        // 3. สั่งให้ Pannellum แสดงผล
+        pannellum.viewer('panorama', {
+            "type": "equirectangular",
+            "panorama": imageUrl,
+            "autoLoad": true,
+            "compass": true
+        });
+    } else {
+        document.getElementById('panorama').innerHTML = "<h2 style='text-align:center; margin-top:20px;'>ไม่พบรูปภาพ (No Image ID provided)</h2>";
+    }
+</script>
+
+</body>
+</html>
