@@ -1,55 +1,25 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>360 Panorama Viewer</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
-    
-    <style>
-        #panorama { width: 100vw; height: 100vh; }
-        body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; }
-        .msg { 
-            color: white; text-align: center; margin-top: 50px; 
-            font-family: sans-serif; font-size: 18px; padding: 20px;
-        }
-    </style>
-</head>
-<body>
-
-<div id="panorama"></div>
-<div id="message" class="msg"></div>
-
 <script>
-    function getQueryParam(param) {
-        let urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
-    }
+function getQueryParam(param){
+    return new URLSearchParams(window.location.search).get(param);
+}
 
-    const imageId = getQueryParam('id');
+const imageId = getQueryParam('id');
 
-    if (imageId) {
-        // 1. สร้างลิงก์ Google Drive ปกติ
-        const driveUrl = `https://drive.google.com/uc?export=view&id=${imageId}`;
-        
-        // 2. ใช้ Proxy เพื่อแก้ปัญหา CORS (Google Drive Block)
-        // เราจะส่งลิงก์ Drive ผ่าน corsproxy.io
-        const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(driveUrl);
+if(imageId){
 
-        pannellum.viewer('panorama', {
-            "type": "equirectangular",
-            "panorama": proxyUrl, 
-            "autoLoad": true,
-            "compass": true,
-            "showZoomCtrl": false,
-            "keyboardZoom": false,
-            "mouseZoom": false
-        });
-    } else {
-        document.getElementById('message').innerHTML = "ไม่พบ ID รูปภาพ<br>กรุณาตรวจสอบลิงก์อีกครั้ง";
-    }
+    const driveUrl = `https://lh3.googleusercontent.com/d/${imageId}`;
+
+    pannellum.viewer('panorama',{
+        type:"equirectangular",
+        panorama: driveUrl,
+        autoLoad:true,
+        compass:true,
+        showZoomCtrl:false,
+        mouseZoom:false,
+        keyboardZoom:false
+    });
+
+}else{
+    document.getElementById('message').innerHTML="ไม่พบ id รูป";
+}
 </script>
-
-</body>
-</html>
