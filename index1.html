@@ -136,61 +136,193 @@
             background: #2980b9;
         }
         
+        /* Info Panel - จะหายเองหลัง 3 วินาที */
         .info-panel {
             position: fixed;
             top: 20px;
             left: 20px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(46, 204, 113, 0.95);
             color: white;
             padding: 15px 20px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 16px;
             z-index: 1000;
             backdrop-filter: blur(10px);
+            display: none;
+            animation: slideInLeft 0.5s ease-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
         
-        .info-panel h3 {
-            margin-bottom: 10px;
-            font-size: 16px;
-            color: #3498db;
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
         
-        .info-panel p {
-            margin: 5px 0;
-            opacity: 0.9;
+        .info-panel.show {
+            display: block;
         }
         
+        .info-panel.hide {
+            animation: slideOutLeft 0.5s ease-out forwards;
+        }
+        
+        @keyframes slideOutLeft {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+        
+        /* Controls Help - มีปุ่มซ่อน/แสดง */
         .controls-help {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             color: white;
-            padding: 15px 20px;
             border-radius: 8px;
             font-size: 13px;
             z-index: 1000;
             backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .controls-toggle {
+            background: rgba(52, 152, 219, 0.9);
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+        
+        .controls-toggle:hover {
+            background: rgba(41, 128, 185, 0.9);
+        }
+        
+        .controls-content {
+            padding: 15px 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        
+        .controls-help.expanded .controls-content {
+            max-height: 300px;
+            padding: 15px 20px;
         }
         
         .controls-help h4 {
-            margin-bottom: 10px;
+            margin: 0 0 10px 0;
             color: #3498db;
         }
         
         .controls-help ul {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
         
         .controls-help li {
             margin: 5px 0;
         }
         
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .controls-help.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
+        
+        /* Mode Switcher */
+        .mode-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .mode-button {
+            background: rgba(52, 152, 219, 0.95);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .mode-button:hover {
+            background: rgba(41, 128, 185, 0.95);
+            transform: scale(1.05);
+        }
+        
+        .mode-button:active {
+            transform: scale(0.95);
+        }
+        
+        .mode-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2ecc71;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
         a-scene {
             display: block;
             width: 100vw;
             height: 100vh;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .controls-help {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                font-size: 12px;
+            }
+            
+            .mode-switcher {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .mode-button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
         }
     </style>
 </head>
@@ -207,30 +339,46 @@
         <button class="retry-button" onclick="location.reload()">ลองใหม่</button>
     </div>
     
-    <div class="info-panel" id="infoPanel" style="display: none;">
-        <h3>📷 ข้อมูลภาพ 360°</h3>
-        <p>Image ID: <span id="imageIdDisplay"></span></p>
-        <p style="color: #2ecc71;">✓ โหลดสำเร็จ</p>
+    <!-- Info Panel - จะหายเองหลัง 3 วินาที -->
+    <div class="info-panel" id="infoPanel">
+        ✓ โหลดสำเร็จ
     </div>
     
-    <div class="controls-help">
-        <h4>🎮 วิธีใช้งาน</h4>
-        <ul>
-            <li>🖱️ ลากเมาส์ - หมุนภาพ</li>
-            <li>🔍 WASD - เคลื่อนที่</li>
-            <li>📱 ปัดนิ้ว - หมุนภาพบนมือถือ</li>
-            <li>🧭 เอียงมือถือ - ใช้ Gyroscope</li>
-        </ul>
+    <!-- Mode Switcher -->
+    <div class="mode-switcher">
+        <button class="mode-button" id="modeButton" onclick="toggleMode()">
+            <div class="mode-indicator"></div>
+            <span id="modeText">Touch Mode</span>
+        </button>
+    </div>
+    
+    <!-- Controls Help -->
+    <div class="controls-help" id="controlsHelp">
+        <div class="controls-toggle" onclick="toggleControls()">
+            <span>🎮 วิธีใช้งาน</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="controls-content">
+            <ul id="controlsList">
+                <li>📱 ปัดนิ้ว - หมุนภาพ (ทุกทิศทาง)</li>
+                <li>🖱️ ลากเมาส์ - หมุนภาพ</li>
+                <li>🔍 WASD - เคลื่อนที่</li>
+            </ul>
+        </div>
     </div>
     
     <a-scene id="scene" loading-screen="enabled: false">
         <a-sky id="panorama" rotation="0 -130 0"></a-sky>
-        <a-camera>
+        <a-camera id="camera" look-controls="magicWindowTrackingEnabled: false">
             <a-cursor></a-cursor>
         </a-camera>
     </a-scene>
     
     <script>
+        // Global variables
+        let currentMode = 'touch'; // 'touch' or 'gyro'
+        let camera;
+        
         function getImageIdFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('id');
@@ -276,12 +424,104 @@
         function hideLoading() {
             setTimeout(() => {
                 document.getElementById('loadingOverlay').classList.add('hidden');
-            }, 2000);
+            }, 1000);
         }
         
-        function showInfoPanel(imageId) {
-            document.getElementById('imageIdDisplay').textContent = imageId;
-            document.getElementById('infoPanel').style.display = 'block';
+        function showSuccessMessage() {
+            const infoPanel = document.getElementById('infoPanel');
+            infoPanel.classList.add('show');
+            
+            // หายไปเองหลัง 3 วินาที
+            setTimeout(() => {
+                infoPanel.classList.add('hide');
+                setTimeout(() => {
+                    infoPanel.style.display = 'none';
+                    infoPanel.classList.remove('show', 'hide');
+                }, 500);
+            }, 3000);
+        }
+        
+        function toggleControls() {
+            const controlsHelp = document.getElementById('controlsHelp');
+            controlsHelp.classList.toggle('expanded');
+        }
+        
+        function toggleMode() {
+            if (currentMode === 'touch') {
+                currentMode = 'gyro';
+                enableGyroMode();
+            } else {
+                currentMode = 'touch';
+                enableTouchMode();
+            }
+            updateModeUI();
+        }
+        
+        function enableGyroMode() {
+            console.log('🧭 เปิด Gyro Mode');
+            if (camera) {
+                // เปิด gyroscope/device orientation
+                camera.setAttribute('look-controls', {
+                    magicWindowTrackingEnabled: true,
+                    touchEnabled: true,
+                    mouseEnabled: true
+                });
+            }
+            
+            // ขอ permission สำหรับ iOS
+            if (typeof DeviceOrientationEvent !== 'undefined' && 
+                typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            console.log('✅ Gyro permission granted');
+                        }
+                    })
+                    .catch(console.error);
+            }
+            
+            updateControlsList('gyro');
+        }
+        
+        function enableTouchMode() {
+            console.log('👆 เปิด Touch Mode');
+            if (camera) {
+                // ปิด gyroscope
+                camera.setAttribute('look-controls', {
+                    magicWindowTrackingEnabled: false,
+                    touchEnabled: true,
+                    mouseEnabled: true
+                });
+            }
+            
+            updateControlsList('touch');
+        }
+        
+        function updateModeUI() {
+            const modeText = document.getElementById('modeText');
+            if (currentMode === 'gyro') {
+                modeText.textContent = 'Gyro Mode';
+            } else {
+                modeText.textContent = 'Touch Mode';
+            }
+        }
+        
+        function updateControlsList(mode) {
+            const controlsList = document.getElementById('controlsList');
+            if (mode === 'gyro') {
+                controlsList.innerHTML = `
+                    <li>🧭 เอียงมือถือ - หมุนภาพ (ทุกทิศทาง)</li>
+                    <li>📱 ปัดนิ้ว - หมุนภาพเพิ่มเติม</li>
+                    <li>🖱️ ลากเมาส์ - หมุนภาพ</li>
+                    <li>🔍 WASD - เคลื่อนที่</li>
+                `;
+            } else {
+                controlsList.innerHTML = `
+                    <li>📱 ปัดนิ้ว - หมุนภาพ (ทุกทิศทาง)</li>
+                    <li>🖱️ ลากเมาส์ - หมุนภาพ</li>
+                    <li>🔍 WASD - เคลื่อนที่</li>
+                `;
+            }
         }
         
         async function testImageUrl(url) {
@@ -324,7 +564,6 @@
                 console.log(`❌ ไม่สามารถใช้: ${method.name}`);
             }
             
-            // ถ้าไม่มีอันไหนผ่านการทดสอบ ก็ใช้อันแรก (มีโอกาสทำงานได้ด้วย A-Frame)
             console.log('⚠️ ไม่พบ URL ที่ทดสอบผ่าน, ลองใช้ Thumbnail API');
             return urls[0].url;
         }
@@ -342,21 +581,24 @@
             }
             
             console.log('🎯 Image ID:', imageId);
-            showInfoPanel(imageId);
+            
+            // รอให้ A-Frame โหลดเสร็จก่อน
+            const scene = document.getElementById('scene');
+            scene.addEventListener('loaded', () => {
+                camera = document.getElementById('camera');
+                enableTouchMode(); // เริ่มต้นด้วย Touch Mode
+            });
             
             try {
-                // หา URL ที่ใช้งานได้
                 const imageUrl = await findWorkingUrl(imageId);
                 console.log('📍 ใช้ URL:', imageUrl);
                 
-                // โหลดภาพใน A-Frame
                 const sky = document.getElementById('panorama');
                 sky.setAttribute('src', imageUrl);
                 
-                // ซ่อน loading
                 hideLoading();
+                showSuccessMessage();
                 
-                // ตรวจสอบว่าโหลดสำเร็จหรือไม่
                 setTimeout(() => {
                     const texture = sky.components.material.material.map;
                     if (!texture || !texture.image || !texture.image.complete) {
